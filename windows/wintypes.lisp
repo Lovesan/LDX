@@ -16,6 +16,11 @@
 (defalias lresult () 'int-ptr)
 (deftype lresult () 'int-ptr)
 
+(defalias long-ptr () 'int-ptr)
+(deftype long-ptr () 'int-ptr)
+(defalias ulong-ptr () 'uint-ptr)
+(deftype ulong-ptr () 'uint-ptr)
+
 (defalias atom () 'word)
 
 (deftype handle () '(or null pointer))

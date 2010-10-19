@@ -17,12 +17,48 @@
     #:lparam
     #:hresult
     #:lresult
+    #:long-ptr
+    #:ulong-ptr
     #:handle
     #:hresult
     #:atom
     #:astring
     #:wstring
     #:tstring
+    #:large-integer
+    #:make-large-integer
+    #:large-integer-p
+    #:large-integer-low-part
+    #:large-integer-high-part
+    #:large-integer-quad-part
+    #:large-integer-p
+    #:copy-large-integer
+    #:ularge-integer
+    #:make-ularge-integer
+    #:ularge-integer-p
+    #:ularge-integer-low-part
+    #:ularge-integer-high-part
+    #:ularge-integer-quad-part
+    #:ularge-integer-p
+    #:copy-ularge-integer
+    #:luid
+    #:copy-luid
+    #:luid-p
+    #:luid-quad-part
+    #:luid-low-part
+    #:luid-high-part
+    #:unicode-string-max-bytes
+    #:unicode-string-max-chars
+    #:list-entry
+    #:list-entry
+    #:list-entry-p
+    #:copy-list-entry
+    #:list-entry-flink
+    #:list-entry-blink
+    #:single-list-entry
+    #:single-list-entry-p
+    #:copy-single-list-entry
+    #:single-list-entry-next
     #:rect
     #:rect-left
     #:rect-top
@@ -57,6 +93,8 @@
     #:ver-suite-storage-server
     #:ver-suite-terminal
     #:ver-suite-home-server
+    #:ver-server-nt
+    #:ver-workstation-nt
     #:version-product-type
     #:ver-nt-domain-controller
     #:ver-nt-server
@@ -73,6 +111,217 @@
     #:osverinfo-service-pack-minor
     #:osverinfo-suite-mask
     #:osverinfo-product-type
+    
+    ;;internationalization features
+    #:lang
+    #:LANG-NEUTRAL
+    #:LANG-INVARIANT
+    #:LANG-AFRIKAANS
+    #:LANG-ALBANIAN
+    #:LANG-ARABIC
+    #:LANG-ARMENIAN
+    #:LANG-ASSAMESE
+    #:LANG-AZERI
+    #:LANG-BASQUE
+    #:LANG-BELARUSIAN
+    #:LANG-BENGALI
+    #:LANG-BULGARIAN
+    #:LANG-CATALAN
+    #:LANG-CHINESE
+    #:LANG-CROATIAN
+    #:LANG-CZECH
+    #:LANG-DANISH
+    #:LANG-DIVEHI
+    #:LANG-DUTCH
+    #:LANG-ENGLISH
+    #:LANG-ESTONIAN
+    #:LANG-FAEROESE
+    #:LANG-FARSI
+    #:LANG-FINNISH
+    #:LANG-FRENCH
+    #:LANG-GALICIAN
+    #:LANG-GEORGIAN
+    #:LANG-GERMAN
+    #:LANG-GREEK
+    #:LANG-GUJARATI
+    #:LANG-HEBREW
+    #:LANG-HINDI
+    #:LANG-HUNGARIAN
+    #:LANG-ICELANDIC
+    #:LANG-INDONESIAN
+    #:LANG-ITALIAN
+    #:LANG-JAPANESE
+    #:LANG-KANNADA
+    #:LANG-KASHMIRI
+    #:LANG-KAZAK
+    #:LANG-KONKANI
+    #:LANG-KOREAN
+    #:LANG-KYRGYZ
+    #:LANG-LATVIAN
+    #:LANG-LITHUANIAN
+    #:LANG-MACEDONIAN
+    #:LANG-MALAY
+    #:LANG-MALAYALAM
+    #:LANG-MANIPURI
+    #:LANG-MARATHI
+    #:LANG-MONGOLIAN
+    #:LANG-NEPALI
+    #:LANG-NORWEGIAN
+    #:LANG-ORIYA
+    #:LANG-POLISH
+    #:LANG-PORTUGUESE
+    #:LANG-PUNJABI
+    #:LANG-ROMANIAN
+    #:LANG-RUSSIAN
+    #:LANG-SANSKRIT
+    #:LANG-SERBIAN
+    #:LANG-SINDHI
+    #:LANG-SLOVAK
+    #:LANG-SLOVENIAN
+    #:LANG-SPANISH
+    #:LANG-SWAHILI
+    #:LANG-SWEDISH
+    #:LANG-SYRIAC
+    #:LANG-TAMIL
+    #:LANG-TATAR
+    #:LANG-TELUGU
+    #:LANG-THAI
+    #:LANG-TURKISH
+    #:LANG-UKRAINIAN
+    #:LANG-URDU
+    #:LANG-UZBEK
+    #:LANG-VIETNAMESE    
+    
+    #:sublang
+    #:SUBLANG-NEUTRAL                      ;; language neutral
+    #:SUBLANG-DEFAULT                      ;; user default
+    #:SUBLANG-SYS-DEFAULT                  ;; system default
+    #:SUBLANG-ARABIC-SAUDI-ARABIA          ;; Arabic (Saudi Arabia)
+    #:SUBLANG-ARABIC-IRAQ                  ;; Arabic (Iraq)
+    #:SUBLANG-ARABIC-EGYPT                 ;; Arabic (Egypt)
+    #:SUBLANG-ARABIC-LIBYA                 ;; Arabic (Libya)
+    #:SUBLANG-ARABIC-ALGERIA               ;; Arabic (Algeria)
+    #:SUBLANG-ARABIC-MOROCCO               ;; Arabic (Morocco)
+    #:SUBLANG-ARABIC-TUNISIA               ;; Arabic (Tunisia)
+    #:SUBLANG-ARABIC-OMAN                  ;; Arabic (Oman)
+    #:SUBLANG-ARABIC-YEMEN                 ;; Arabic (Yemen)
+    #:SUBLANG-ARABIC-SYRIA                 ;; Arabic (Syria)
+    #:SUBLANG-ARABIC-JORDAN                ;; Arabic (Jordan)
+    #:SUBLANG-ARABIC-LEBANON               ;; Arabic (Lebanon)
+    #:SUBLANG-ARABIC-KUWAIT                ;; Arabic (Kuwait)
+    #:SUBLANG-ARABIC-UAE                   ;; Arabic (U.A.E)
+    #:SUBLANG-ARABIC-BAHRAIN               ;; Arabic (Bahrain)
+    #:SUBLANG-ARABIC-QATAR                 ;; Arabic (Qatar)
+    #:SUBLANG-AZERI-LATIN                  ;; Azeri (Latin)
+    #:SUBLANG-AZERI-CYRILLIC               ;; Azeri (Cyrillic)
+    #:SUBLANG-CHINESE-TRADITIONAL          ;; Chinese (Taiwan)
+    #:SUBLANG-CHINESE-SIMPLIFIED           ;; Chinese (PR China)
+    #:SUBLANG-CHINESE-HONGKONG             ;; Chinese (Hong Kong S.A.R., P.R.C.)
+    #:SUBLANG-CHINESE-SINGAPORE            ;; Chinese (Singapore)
+    #:SUBLANG-CHINESE-MACAU                ;; Chinese (Macau S.A.R.)
+    #:SUBLANG-DUTCH                        ;; Dutch
+    #:SUBLANG-DUTCH-BELGIAN                ;; Dutch (Belgian)
+    #:SUBLANG-ENGLISH-US                   ;; English (USA)
+    #:SUBLANG-ENGLISH-UK                   ;; English (UK)
+    #:SUBLANG-ENGLISH-AUS                  ;; English (Australian)
+    #:SUBLANG-ENGLISH-CAN                  ;; English (Canadian)
+    #:SUBLANG-ENGLISH-NZ                   ;; English (New Zealand)
+    #:SUBLANG-ENGLISH-EIRE                 ;; English (Irish)
+    #:SUBLANG-ENGLISH-SOUTH-AFRICA         ;; English (South Africa)
+    #:SUBLANG-ENGLISH-JAMAICA              ;; English (Jamaica)
+    #:SUBLANG-ENGLISH-CARIBBEAN            ;; English (Caribbean)
+    #:SUBLANG-ENGLISH-BELIZE               ;; English (Belize)
+    #:SUBLANG-ENGLISH-TRINIDAD             ;; English (Trinidad)
+    #:SUBLANG-ENGLISH-ZIMBABWE             ;; English (Zimbabwe)
+    #:SUBLANG-ENGLISH-PHILIPPINES          ;; English (Philippines)
+    #:SUBLANG-FRENCH                       ;; French
+    #:SUBLANG-FRENCH-BELGIAN               ;; French (Belgian)
+    #:SUBLANG-FRENCH-CANADIAN              ;; French (Canadian)
+    #:SUBLANG-FRENCH-SWISS                 ;; French (Swiss)
+    #:SUBLANG-FRENCH-LUXEMBOURG            ;; French (Luxembourg)
+    #:SUBLANG-FRENCH-MONACO                ;; French (Monaco)
+    #:SUBLANG-GERMAN                       ;; German
+    #:SUBLANG-GERMAN-SWISS                 ;; German (Swiss)
+    #:SUBLANG-GERMAN-AUSTRIAN              ;; German (Austrian)
+    #:SUBLANG-GERMAN-LUXEMBOURG            ;; German (Luxembourg)
+    #:SUBLANG-GERMAN-LIECHTENSTEIN         ;; German (Liechtenstein)
+    #:SUBLANG-ITALIAN                      ;; Italian
+    #:SUBLANG-ITALIAN-SWISS                ;; Italian (Swiss)
+    #:SUBLANG-KASHMIRI-SASIA               ;; Kashmiri (South Asia)
+    #:SUBLANG-KASHMIRI-INDIA               ;; For app compatibility only
+    #:SUBLANG-KOREAN                       ;; Korean (Extended Wansung)
+    #:SUBLANG-LITHUANIAN                   ;; Lithuanian
+    #:SUBLANG-MALAY-MALAYSIA               ;; Malay (Malaysia)
+    #:SUBLANG-MALAY-BRUNEI-DARUSSALAM      ;; Malay (Brunei Darussalam)
+    #:SUBLANG-NEPALI-INDIA                 ;; Nepali (India)
+    #:SUBLANG-NORWEGIAN-BOKMAL             ;; Norwegian (Bokmal)
+    #:SUBLANG-NORWEGIAN-NYNORSK            ;; Norwegian (Nynorsk)
+    #:SUBLANG-PORTUGUESE                   ;; Portuguese
+    #:SUBLANG-PORTUGUESE-BRAZILIAN         ;; Portuguese (Brazilian)
+    #:SUBLANG-SERBIAN-LATIN                ;; Serbian (Latin)
+    #:SUBLANG-SERBIAN-CYRILLIC             ;; Serbian (Cyrillic)
+    #:SUBLANG-SPANISH                      ;; Spanish (Castilian)
+    #:SUBLANG-SPANISH-MEXICAN              ;; Spanish (Mexican)
+    #:SUBLANG-SPANISH-MODERN               ;; Spanish (Spain)
+    #:SUBLANG-SPANISH-GUATEMALA            ;; Spanish (Guatemala)
+    #:SUBLANG-SPANISH-COSTA-RICA           ;; Spanish (Costa Rica)
+    #:SUBLANG-SPANISH-PANAMA               ;; Spanish (Panama)
+    #:SUBLANG-SPANISH-DOMINICAN-REPUBLIC   ;; Spanish (Dominican Republic)
+    #:SUBLANG-SPANISH-VENEZUELA            ;; Spanish (Venezuela)
+    #:SUBLANG-SPANISH-COLOMBIA             ;; Spanish (Colombia)
+    #:SUBLANG-SPANISH-PERU                 ;; Spanish (Peru)
+    #:SUBLANG-SPANISH-ARGENTINA            ;; Spanish (Argentina)
+    #:SUBLANG-SPANISH-ECUADOR              ;; Spanish (Ecuador)
+    #:SUBLANG-SPANISH-CHILE                ;; Spanish (Chile)
+    #:SUBLANG-SPANISH-URUGUAY              ;; Spanish (Uruguay)
+    #:SUBLANG-SPANISH-PARAGUAY             ;; Spanish (Paraguay)
+    #:SUBLANG-SPANISH-BOLIVIA              ;; Spanish (Bolivia)
+    #:SUBLANG-SPANISH-EL-SALVADOR          ;; Spanish (El Salvador)
+    #:SUBLANG-SPANISH-HONDURAS             ;; Spanish (Honduras)
+    #:SUBLANG-SPANISH-NICARAGUA            ;; Spanish (Nicaragua)
+    #:SUBLANG-SPANISH-PUERTO-RICO          ;; Spanish (Puerto Rico)
+    #:SUBLANG-SWEDISH                      ;; Swedish
+    #:SUBLANG-SWEDISH-FINLAND              ;; Swedish (Finland)
+    #:SUBLANG-URDU-PAKISTAN                ;; Urdu (Pakistan)
+    #:SUBLANG-URDU-INDIA                   ;; Urdu (India)
+    #:SUBLANG-UZBEK-LATIN                  ;; Uzbek (Latin)
+    #:SUBLANG-UZBEK-CYRILLIC              ;; Uzbek (Cyrillic)
+    
+    
+    #:lang-sort
+    #:sort-default
+    #:sort-japanese-xjis
+    #:sort-japanese-unicode
+    #:sort-chinese-big5
+    #:sort-chinese-prcp
+    #:sort-chinese-unicode
+    #:sort-chinese-prc
+    #:sort-chinese-bopomofo
+    #:sort-korean-ksc
+    #:sort-korean-unicode
+    #:sort-german-phone-book
+    #:sort-hungarian-default
+    #:sort-hungarian-technical
+    #:sort-georgian-traditional
+    #:sort-georgean-modern
+    
+    #:make-lang-id
+    #:primary-lang-id
+    #:sublang-id
+    #:nls-valid-locale-mask
+    #:make-locale-id
+    #:make-sort-locale-id
+    #:lang-id-from-locale-id
+    #:sort-id-from-locale-id
+    #:sort-version-from-locale-id
+    #:lang-system-default
+    #:lang-user-default
+    #:locale-system-default
+    #:locale-user-default
+    #:locale-neutral
+    #:locale-invariant
+
+    
     
     ;;utility functions
     #:make-short
@@ -185,4 +434,10 @@
     #:define-fmtid
     #:with-fmtid-accessors
     #:fmtid-equal
+        
+    #:objectid
+    #:copy-objectid
+    #:objectid-p
+    #:objectid-lineage
+    #:objectid-uniquifier
     ))

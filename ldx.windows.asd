@@ -7,10 +7,11 @@
                                      (:file "libraries")
                                      (:file "features")
                                      (:file "wintypes")
+                                     (:file "winnt")
+                                     (:file "uuid")
                                      (:file "osversion")
                                      (:file "hresult")
                                      (:file "winbase")
-                                     (:file "guid")
                                      ))))
 
 ;; vim: ft=lisp et

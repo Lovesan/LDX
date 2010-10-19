@@ -14,7 +14,13 @@
   (:small-business-restricted #x00000020)
   (:storage-server #x00002000)
   (:terminal #x00000010)
+  (:communications #x00000008)
+  (:embedded-restricted #x00000800)
+  (:security-appliance #x00001000)
   (:home-server #x00008000))
+
+(defconstant ver-server-nt #x80000000)
+(defconstant ver-workstation-nt #x40000000)
 
 (define-enum (version-product-type
                (:conc-name ver-nt-)
@@ -30,7 +36,7 @@
   (minor-version dword)
   (build-number dword)
   (platform-id dword)
-  (csd-version (wstring 128))
+  (csd-version (tstring 128))
   (service-pack-major word)
   (service-pack-minor word)
   (suite-mask word)
@@ -66,7 +72,7 @@
                     (2 (cond
                          ((eq (osverinfo-product-type info) :workstation)
                           :winxp64)
-                         ((logand (osverinfo-suite-mask info)
+                         ((logior (osverinfo-suite-mask info)
                                   ver-suite-home-server)
                           :winhomeserver)
                          (T :winserver2003)))))

@@ -238,3 +238,8 @@
        (defmethod uuid-of ((name (eql ',name)))
          ,uuid)
        ',name)))
+
+(define-struct (objectid
+                 (:constructor objectid (lineage uniquifier)))
+  (lineage    guid)
+  (uniquifier dword))
