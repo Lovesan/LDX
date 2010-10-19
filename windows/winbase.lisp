@@ -1,24 +1,5 @@
 (in-package #:ldx.windows)
 
-(defalias word () 'uint16)
-(deftype word () 'uint16)
-
-(defalias dword () 'uint32)
-(deftype dword () 'uint32)
-
-(defalias qword () 'uint64)
-(deftype qword () 'uint64)
-
-(defalias wparam () 'uint-ptr)
-(deftype wparam () 'uint-ptr)
-(defalias lparam () 'int-ptr)
-(deftype lparam () 'int-ptr)
-(defalias lresult () 'int-ptr)
-(deftype lresult () 'int-ptr)
-
-(defalias handle () 'pointer)
-(deftype handle () 'pointer)
-
 (declaim (inline make-short))
 (defun make-short (a b)
   (lognot (logand #xFFFF

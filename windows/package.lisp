@@ -3,6 +3,11 @@
 (defpackage #:ldx.windows
   (:use #:cl #:alexandria #:virgil)
   (:export
+    ;;libraries
+    #:kernel32
+    #:user32
+    #:gdi32
+    #:ws2-32
     
     ;;windows types, constructors and accessors
     #:word
@@ -13,6 +18,11 @@
     #:hresult
     #:lresult
     #:handle
+    #:hresult
+    #:atom
+    #:astring
+    #:wstring
+    #:tstring
     #:rect
     #:rect-left
     #:rect-top
@@ -30,6 +40,39 @@
     #:filetime
     #:filetime-low-date-time
     #:filetime-high-date-time
+    
+    ;;winnt version
+    #:winnt-version
+    #:version-suite
+    #:ver-suite-backoffice
+    #:ver-suite-blade
+    #:ver-suite-compute-server
+    #:ver-suite-datacenter
+    #:ver-suite-enterprise
+    #:ver-suite-embedded-nt
+    #:ver-suite-personal
+    #:ver-suite-single-user-ts
+    #:ver-suite-small-business
+    #:ver-suite-small-business-restricted
+    #:ver-suite-storage-server
+    #:ver-suite-terminal
+    #:ver-suite-home-server
+    #:version-product-type
+    #:ver-nt-domain-controller
+    #:ver-nt-server
+    #:ver-nt-workstation
+    #:os-version-info
+    #:os-version-info-ex-p
+    #:osverinfo-size
+    #:osverinfo-major-version
+    #:osverinfo-minor-version
+    #:osverinfo-build-number
+    #:osverinfo-platform-id
+    #:osverinfo-csd-version
+    #:osverinfo-service-pack-major
+    #:osverinfo-service-pack-minor
+    #:osverinfo-suite-mask
+    #:osverinfo-product-type
     
     ;;utility functions
     #:make-short

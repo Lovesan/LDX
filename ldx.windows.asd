@@ -4,6 +4,11 @@
   :components ((:module "windows"
                         :serial t
                         :components ((:file "package")
+                                     (:file "libraries")
+                                     (:file "features")
+                                     (:file "wintypes")
+                                     (:file "osversion")
+                                     (:file "hresult")
                                      (:file "winbase")
                                      (:file "guid")
                                      ))))
