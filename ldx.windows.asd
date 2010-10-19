@@ -7,10 +7,11 @@
                                      (:file "libraries")
                                      (:file "features")
                                      (:file "wintypes")
+                                     (:file "hresult")
+                                     (:file "winerror")
+                                     (:file "osversion")
                                      (:file "winnt")
                                      (:file "uuid")
-                                     (:file "osversion")
-                                     (:file "hresult")
                                      (:file "winbase")
                                      ))))
 

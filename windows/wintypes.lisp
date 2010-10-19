@@ -62,9 +62,9 @@
                            nil)))
 
 (defalias tstring (&optional length)
-  #+ldx.windows::unicode `(wstring ,length)
-  #-ldx.windows::unicode `(astring ,length))
+  #+ldx.unicode `(wstring ,length)
+  #-ldx.unicode `(astring ,length))
 
 (defalias tchar ()
-  #+ldx.windows::unicode 'wchar
-  #-ldx.windows::unicode 'char)
+  #+ldx.unicode 'wchar
+  #-ldx.unicode 'char)

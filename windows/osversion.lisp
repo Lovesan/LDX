@@ -46,7 +46,7 @@
 (define-external-function
     ("GetVersion" (:camel-case))
     (:stdcall kernel32)
-  (dword))
+  ((windows-assert dword not-zero)))
 
 (load-time-value
   (defconstant winnt-version  (get-version)))
@@ -56,35 +56,33 @@
      #-ldx.unicode "GetVersionExA"
                  get-version-ex)
     (:stdcall kernel32)
-  (boolean rv (when rv
-                version-info))
+  ((windows-assert boolean) rv version-info)
   (version-info (& os-version-info-ex :inout)
                 :aux
                 (make-os-version-info-ex
                   :size (sizeof 'os-version-info-ex))))
 
 (let ((info (get-version-ex)))
-  (when info
-    (pushnew (case (osverinfo-major-version info)
-               (5 (case (osverinfo-minor-version info)
-                    (0 :win2000)
-                    (1 :winxp)
-                    (2 (cond
-                         ((eq (osverinfo-product-type info) :workstation)
-                          :winxp64)
-                         ((logior (osverinfo-suite-mask info)
-                                  ver-suite-home-server)
-                          :winhomeserver)
-                         (T :winserver2003)))))
-               (6 (case (osverinfo-minor-version info)
-                    (0 (if (eq (osverinfo-product-type info)
-                               :workstation)
-                         :winvista
-                         :winserver2008))
-                    (1 (if (eq (osverinfo-product-type info)
-                               :workstation)
-                         :win7
-                         :winserver2008r2))
-                    (T :windows)))
-               (T :windows))
-             *features*)))
+  (pushnew (case (osverinfo-major-version info)
+             (5 (case (osverinfo-minor-version info)
+                  (0 :win2000)
+                  (1 :winxp)
+                  (2 (cond
+                       ((eq (osverinfo-product-type info) :workstation)
+                        :winxp64)
+                       ((/= 0 (logand (osverinfo-suite-mask info)
+                                      ver-suite-home-server))
+                        :winhomeserver)
+                       (T :winserver2003)))))
+             (6 (case (osverinfo-minor-version info)
+                  (0 (if (eq (osverinfo-product-type info)
+                             :workstation)
+                       :winvista
+                       :winserver2008))
+                  (1 (if (eq (osverinfo-product-type info)
+                             :workstation)
+                       :win7
+                       :winserver2008r2))
+                  (T :windows)))
+             (T :windows))
+           *features*))

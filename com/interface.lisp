@@ -170,24 +170,32 @@
                                                    interface-name
                                                    method-name
                                                    'trampoline)
-                                           :ldx.com)))
+                                           :ldx.com))
+                  (condition (gensym (string 'condition))))
              `((progn (define-callback (,trampoline-name :stdcall) ,return-type
                         ((,this-var size-t)
                          ,@(loop :for (arg-name arg-typespec . rest) :in args :collect
                              (list arg-name arg-typespec)))
-                        (let ((,rv-var ,(expand-prototype (parse-typespec return-type))))
-                          (multiple-value-setq
-                            (,rv-var ,@(mapcar #'car args))
-                            (,method-name ,@(if (consp method-name)
-                                              `(,(car primary)
-                                                  (gethash ,this-var *pointer-to-object-mapping*)
-                                                  ,@(rest primary))
-                                              `((gethash ,this-var *pointer-to-object-mapping*)
-                                                ,@primary))
-                                          ,@optional
-                                          ,@(loop :for name :in key :nconc
-                                              (list (intern (string name) :keyword) name))))
-                          ,rv-var))
+                        ,(let ((body `(let ((,rv-var ,(expand-prototype (parse-typespec return-type))))
+                                        (multiple-value-setq
+                                          (,rv-var ,@(mapcar #'car args))
+                                          (,method-name ,@(if (consp method-name)
+                                                            `(,(car primary)
+                                                                (gethash ,this-var *pointer-to-object-mapping*)
+                                                                ,@(rest primary))
+                                                            `((gethash ,this-var *pointer-to-object-mapping*)
+                                                              ,@primary))
+                                                        ,@optional
+                                                        ,@(loop :for name :in key :nconc
+                                                            (list (intern (string name) :keyword) name))))
+                                        ,rv-var)))
+                           (if (eq return-type 'hresult)
+                             `(handler-case
+                                  ,body
+                                (windows-error (,condition) ,condition)
+                                (error () (make-condition 'windows-error
+                                            :code error-unexpected-failure)))
+                             body)))
                       (setf (deref ,vtable-name 'pointer ,(* vtable-index (sizeof '*)))
                             (callback ,trampoline-name)))
                ,trampoline-name)))))))

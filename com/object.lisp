@@ -2,15 +2,6 @@
 
 (defvar *registered-com-objects* (make-array 0 :adjustable t :fill-pointer 0))
 
-(define-condition unknown-interface-error (error)
-  ((name :initarg :name
-         :initform nil
-         :accessor unknown-interface-error-name))
-  (:report (lambda (condition stream)
-             (format stream "Unknown inteface: ~s"
-                     (unknown-interface-error-name condition))
-             condition)))
-
 (defclass com-object ()
   ((ref-count :initform 0
               :accessor com-object-ref-count)
@@ -20,12 +11,12 @@
 (defmethod shared-initialize :after ((object com-object) slot-names
                                       &rest initargs &key &allow-other-keys)
   (declare (ignore slot-names initargs))
-  (or (position object *registered-com-objects* :test #'eq)
-      (progn (finalize object (let ((pointers (com-object-interface-pointers object)))
-                                (lambda ()
-                                  (maphash (lambda (k v)
-                                             (declare (ignore k)) (free v 'pointer))
-                                    pointers))))))
+  (unless (find object *registered-com-objects* :test #'eq)
+    (finalize object (let ((pointers (com-object-interface-pointers object)))
+                       (lambda ()
+                         (maphash (lambda (k v)
+                                    (declare (ignore k)) (free v 'pointer))
+                           pointers)))))
   object)
 
 (defgeneric query-interface (object name))
@@ -46,7 +37,7 @@
                              (gethash name *com-interface-types*))
                            interface-pointer))))
       (let* ((type (or (gethash name *com-interface-types*)
-                       (error 'unknown-interface-error :name name)))
+                       (error 'windows-error :code error-no-interface)))
              (vtable (symbol-value (com-interface-type-vtable-name type)))
              (interface-pointers (com-object-interface-pointers object))
              (pointer (or (gethash name interface-pointers)
@@ -64,23 +55,9 @@
             (lambda () (release object))))
 
 (defmethod query-interface ((object com-object) (name uuid))
-  (handler-case
-      (values 0 name (com-interface-pointer
-                       (acquire-interface object (uuid-is name))))
-    (error () (values -1 name &0))))
-
-(defmethod query-interface ((object com-object) (name symbol))
-  (values 0 (uuid-of name) (com-interface-pointer
-                             (acquire-interface object name))))
-
-(defun query-interface* (object name)
-  (declare (type com-object object) (type (or symbol uuid) name))
-  (multiple-value-bind
-      (result iid pointer) (query-interface object name)
-    (progn (if (zerop result)
-             (finalize (translate pointer (uuid-is iid))
-                       (lambda () (release object)))
-             ()))))
+  (values nil
+          name
+          (com-interface-pointer (acquire-interface object (uuid-is name)))))
 
 (defmethod add-ref ((object com-object))
   (or (position object *registered-com-objects* :test #'eq)

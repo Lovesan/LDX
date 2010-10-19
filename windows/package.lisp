@@ -77,6 +77,80 @@
     #:filetime-low-date-time
     #:filetime-high-date-time
     
+    ;;errors and conditions
+    #:facility
+    #:facility-null
+    #:facility-rpc
+    #:facility-dispatch
+    #:facility-storage
+    #:facility-interface
+    #:facility-win32
+    #:facility-windows
+    #:facility-security
+    #:facility-sspi
+    #:facility-control
+    #:facility-certification
+    #:facility-internet
+    #:facility-media-server
+    #:facility-msmq
+    #:facility-setup-api
+    #:facility-smart-card
+    #:facility-com+
+    #:facility-aaf
+    #:facility-urt
+    #:facility-acs
+    #:facility-direct-play
+    #:facility-umi
+    #:facility-sxs
+    #:facility-windows-ce
+    #:facility-http
+    #:facility-background-copy
+    #:facility-configuration
+    #:facility-state-management
+    #:facility-meta-directory
+    #:facility-windows-update
+    #:facility-directory-service
+
+    #:make-hresult
+    #:hresult-from-win32
+    #:hresult-from-nt
+    #:hresult-error-p
+    #:hresult-facility
+    #:hresult-code
+
+    #:windows-condition
+    #:windows-condition-code
+
+    #:define-results
+
+    #:windows-status
+    #:windows-status-code
+
+    #:status-ok
+    #:status-false
+
+    #:windows-error
+    #:windows-error-code
+
+    #:error-success
+    #:error-unexpected-failure
+    #:error-not-implemented
+    #:error-out-of-memory
+    #:error-invalid-arg
+    #:error-no-interface
+    #:error-invalid-pointer
+    #:error-invalid-handle
+    #:error-abort
+    #:error-failure
+    #:error-access-denied
+    #:error-data-pending
+    
+    #:get-last-error
+    #:set-last-error
+    #:assert
+    #:last-error
+    #:windows-assert
+    
     ;;winnt version
     #:winnt-version
     #:version-suite

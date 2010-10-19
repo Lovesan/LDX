@@ -5,10 +5,8 @@
     #xC0 #x00 #x00 #x00 #x00 #x00 #x00 #x46)
 
 (define-interface unknown (iid-unknown)
-  "The top interface of COM hierarchy"
-  (query-interface (int-ptr rv
-                     (finalize-unknown
-                       (translate pointer (uuid-is iid))))
+  "Lisp wrapper for IUnknown inteface"
+  (query-interface (hresult rv (translate pointer (uuid-is iid)))
     (iid (& iid))
     (pointer (& pointer :out) :aux))
   (add-ref (ulong))
@@ -56,7 +54,7 @@
 
 (defvar *adder-object* (make-instance 'adder-object))
 
-(defvar *adder-object-unknown* (query-interface* *adder-object* 'unknown))
+(defvar *adder-object-unknown* (acquire-interface* *adder-object* 'unknown))
 
 (defvar *adder-object-adder* (query-interface *adder-object-unknown* iid-adder))
 
