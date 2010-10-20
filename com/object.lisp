@@ -25,39 +25,27 @@
 
 (defun acquire-interface (object name)
   (declare (type com-object object) (type symbol name))
-  (let ((interface-pointer (gethash name (com-object-interface-pointers object))))
-    (if interface-pointer
-      (progn
-        (add-ref object)
-        (or (gethash (&& interface-pointer) *pointer-to-interface-mapping*)
-            (setf (gethash (&& interface-pointer) *pointer-to-object-mapping*)
-                  object
-                  (gethash (&& interface-pointer) *pointer-to-interface-mapping*)
-                  (funcall (com-interface-type-constructor-name
-                             (gethash name *com-interface-types*))
-                           interface-pointer))))
-      (let* ((type (or (gethash name *com-interface-types*)
-                       (error 'windows-error :code error-no-interface)))
-             (vtable (symbol-value (com-interface-type-vtable-name type)))
-             (interface-pointers (com-object-interface-pointers object))
-             (pointer (or (gethash name interface-pointers)
-                          (setf (gethash name interface-pointers)
-                                (alloc 'pointer vtable))))
-             (interface (funcall (com-interface-type-constructor-name type)
-                                 pointer)))
-        (add-ref object)
-        (setf (gethash (&& pointer) *pointer-to-object-mapping*) object
-              (gethash (&& pointer) *pointer-to-interface-mapping*) interface)))))
-
-(defun acquire-interface* (object name)
-  (declare (type com-object object) (type symbol name))
-  (finalize (acquire-interface object name)
-            (lambda () (release object))))
+  (let* ((pointer (or (gethash name (com-object-interface-pointers object))
+                      (let* ((vtable (symbol-value
+                                       (com-interface-class-vtable-name
+                                         (find-interface-class name))))
+                             (pointer (alloc '* vtable)))
+                        (setf (gethash name (com-object-interface-pointers object))
+                              pointer))))
+         (typed-pointer (cons (&& pointer) name))
+         (interface (translate-interface pointer name)))
+    (add-ref object)
+    (setf (gethash (&& pointer) *pointer-to-object-mapping*)
+          object)
+    interface))
 
 (defmethod query-interface ((object com-object) (name uuid))
   (values nil
           name
-          (com-interface-pointer (acquire-interface object (iid-is name)))))
+          (com-interface-pointer
+            (acquire-interface
+              object
+              (class-name (find-interface-class-by-iid name))))))
 
 (defmethod add-ref ((object com-object))
   (or (position object *registered-com-objects* :test #'eq)

@@ -276,43 +276,24 @@
 (defmacro define-ole-guid (name dw w1 w2)
   `(define-guid ,name ,dw ,w1 ,w2 #xC0 #x00 #x00 #x00 #x00 #x00 #x00 #x46))
 
-(define-uuid  null-uuid  0 0 0 0 0 0 0 0 0 0 0)
-(define-guid  null-guid  0 0 0 0 0 0 0 0 0 0 0)
-(define-iid   null-iid   0 0 0 0 0 0 0 0 0 0 0)
-(define-clsid null-clsid 0 0 0 0 0 0 0 0 0 0 0)
-(define-fmtid null-fmtid 0 0 0 0 0 0 0 0 0 0 0)
+(define-uuid  uuid-null  0 0 0 0 0 0 0 0 0 0 0)
+(define-guid  guid-null  0 0 0 0 0 0 0 0 0 0 0)
+(define-iid   iid-null   0 0 0 0 0 0 0 0 0 0 0)
+(define-clsid clsid-null 0 0 0 0 0 0 0 0 0 0 0)
+(define-fmtid fmtid-null 0 0 0 0 0 0 0 0 0 0 0)
 
-(defvar *registered-class-names* (make-hash-table :test #'eq))
+(defgeneric uuid-of (class)
+  (:method (class)
+    (error 'windows-error :code error-invalid-arg))
+  (:method ((class symbol))
+    (uuid-of (find-class class)))
+  (:method ((class null))
+    uuid-null))
 
-(declaim (inline uuid-of))
-(defun uuid-of (value)
-  (if (null value)
-    null-uuid
-    (let ((name (if (symbolp value)
-                  value
-                  (class-name (class-of value)))))
-      (or (gethash name *registered-class-names*)
-          (error 'windows-error :code error-invalid-arg)))))
-
-(define-compiler-macro uuid-of (&whole form value)
-  (if (constantp value)
-    (let ((value (eval value)))
-      (if (null value)
-        null-uuid
-        (let ((name (if (symbolp value)
-                      value
-                      (class-name (class-of value)))))
-          (or (gethash name *registered-class-names*)
-              (error 'windows-error :code error-invalid-arg)))))
+(define-compiler-macro uuid-of (&whole form class)
+  (if (constantp class)
+    (uuid-of (eval class))
     form))
-
-(defmacro register-class-uuid (class-name uuid)
-  (check-type class-name symbol)
-    `(eval-when (:compile-toplevel :load-toplevel :execute)
-       ,(once-only (uuid)
-          `(setf (gethash ',class-name *registered-class-names*)
-                 (progn (check-type ,uuid uuid) ,uuid)))
-       ',class-name))
 
 (define-struct (objectid
                  (:constructor objectid (lineage uniquifier)))

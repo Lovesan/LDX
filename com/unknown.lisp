@@ -4,25 +4,36 @@
     ((iid-unknown #x00000000 #x0000 #x0000
                   #xC0 #x00 #x00 #x00 #x00 #x00 #x00 #x46))
   "Lisp wrapper for IUnknown inteface"
-  (query-interface (hresult rv (translate pointer (iid-is iid)))
+  (query-interface (hresult rv
+                     (let ((class (find-interface-class-by-iid iid nil)))
+                       (unless class
+                         (when (&? pointer)
+                           (external-pointer-call
+                             (deref (&+ (deref pointer '*) 2 '*) '*)
+                             ((:stdcall)
+                              (ulong)
+                              (pointer this :aux pointer))))
+                         (error 'windows-error :code error-no-interface))
+                       (translate-interface pointer (class-name class))))
     (iid (& iid))
     (pointer (& pointer :out) :aux))
   (add-ref (ulong))
   (release (ulong)))
 
-(defun finalize-unknown (object)
-  (declare (type unknown object))
-  (let ((pobject (com-interface-pointer object)))
-    (declare (type pointer pobject))
-    (finalize object
-              (lambda ()
-                (external-pointer-call
-                  (deref (&+ (deref pobject '*) 2 'pointer)
-                         'pointer)
-                  ((:stdcall)
-                   (ulong)
-                   (pointer))
-                  pobject)))))
+(defmethod shared-initialize :after
+  ((object unknown) slot-names &rest initargs &key &allow-other-keys)
+  (declare (ignore slot-names initargs))
+  (when (com-interface-finalizable-p object)
+    (let ((pobject (com-interface-pointer object)))
+      (declare (type pointer pobject))
+      (when (&? pobject)
+        (finalize object (lambda ()
+                           (external-pointer-call
+                             (deref (&+ (deref pobject '*) 2 '*) '*)
+                             ((:stdcall)
+                              (ulong)
+                              (pointer this :aux pobject))))))))
+  object)
 
 (defmacro with-interface ((var interface) &body body)
   `(let ((,var ,interface))
@@ -36,61 +47,3 @@
     `(with-interface ,(car specs)
        (with-interfaces ,(rest specs)
          ,@body))))
-
-#|
-
-(define-iid iid-adder #xCAFEBABE 0 0 1 2 3 4 5 6 7 8)
-
-(define-interface adder (iid-adder unknown)
-  (add (int) (x int) (y int)))
-
-(defclass adder-object (com-object)
-  ())
-
-(defmethod add ((object adder-object) x y)
-  (values (+ x y) x y))
-
-(defvar *adder-object* (make-instance 'adder-object))
-
-(defvar *adder-object-unknown* (acquire-interface* *adder-object* 'unknown))
-
-(defvar *adder-object-adder* (query-interface *adder-object-unknown* iid-adder))
-
-(format t "~s : ~s"
-        '(add *adder-object-adder* 1 2)
-        (add *adder-object-adder* 1 2))
-
-(finalize *adder-object-unknown*
-          (lambda ()
-            (format t "~&~s disposing~%" '*adder-object-unknown*)))
-(finalize *adder-object-adder*
-          (lambda ()
-            (format t "~&~s disposing~%" '*adder-object-adder*)))
-(finalize *adder-object*
-          (lambda ()
-            (format t "~&~s disposing~%" '*adder-object*)))
-
-(makunbound '*adder-object*)
-(makunbound '*adder-object-unknown*)
-(makunbound '*adder-object-adder*)
-
-(define-interface stack ()
-  (stack-push (void) (value int))
-  (stack-pop (boolean rv (if rv out))
-             (out (& int :out) :aux)))
-
-(defclass stack-object (com-object)
-  ((stack :initform '()
-          :initarg :stack
-          :accessor stack-object-stack)))
-
-(defmethod stack-push ((object stack-object) value)
-  (push value (stack-object-stack object))
-  (values nil value))
-
-(defmethod stack-pop ((object stack-object))
-  (if (null (stack-object-stack object))
-    (values nil 0)
-    (values t (pop (stack-object-stack object)))))
-
-|#

@@ -73,7 +73,7 @@
           (if error-if-no-error
             (error 'windows-error :code error-failure)
             default-value)))
-      (error 'non-sytem-error :code last-error))))
+      (error 'non-system-error :code last-error))))
 
 (defun %last-error (value)
   (declare (ignore value))
