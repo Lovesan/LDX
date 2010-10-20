@@ -181,11 +181,11 @@
               `((closer-mop:defclass ,name (,(or parent-name 'com-interface))
                   ()
                   (:metaclass com-interface-class)
-                  (:iid . ,iid-name)
                   (:vtable-name . ,vtable-name)
                   (:methods ,@parent-methods ,@direct-methods))
                 (closer-mop:finalize-inheritance (find-class ',name))
                 ,form
+                (setf (slot-value (find-class ',name) 'iid) ,iid-name)
                 (define-type-parser ,name (&optional (finalizable T))
                   (make-instance 'com-interface-type :name ',name
                     :finalizable finalizable)))))
