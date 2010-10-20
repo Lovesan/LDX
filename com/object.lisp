@@ -57,7 +57,7 @@
 (defmethod query-interface ((object com-object) (name uuid))
   (values nil
           name
-          (com-interface-pointer (acquire-interface object (uuid-is name)))))
+          (com-interface-pointer (acquire-interface object (iid-is name)))))
 
 (defmethod add-ref ((object com-object))
   (or (position object *registered-com-objects* :test #'eq)

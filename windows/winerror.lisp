@@ -43,6 +43,18 @@
   (declare (type windows-error windows-error))
   (slot-value windows-error 'code))
 
+(define-condition non-system-error (windows-error)
+  ()
+  (:report (lambda (condition stream)
+             (format stream "Non-system error. Code: ~s"
+                     (windows-condition-code condition))
+             condition)))
+
+(declaim (inline system-error-code-p))
+(defun system-error-code-p (code)
+  (declare (type dword code))
+  (not (logbitp 29 code)))
+
 (define-external-function ("GetLastError" (:camel-case))
     (:stdcall kernel32)
   (dword))
@@ -53,76 +65,19 @@
   (error-code dword))
 
 (defun last-error (&optional (error-if-no-error T) default-value)
-  (let ((result (hresult-from-win32 (get-last-error))))
-    (if (hresult-error-p result)
-      (error 'windows-error :code result)
-      (if error-if-no-error
-        (error 'windows-error :code error-failure)
-        default-value))))
+  (let ((last-error (get-last-error)))
+    (if (system-error-code-p last-error)
+      (let ((result (hresult-from-win32 last-error)))
+        (if (hresult-error-p result)
+          (error 'windows-error :code result)
+          (if error-if-no-error
+            (error 'windows-error :code error-failure)
+            default-value)))
+      (error 'non-sytem-error :code last-error))))
 
 (defun %last-error (value)
   (declare (ignore value))
   (last-error))
-
-(defun error-assertion-failed (value)
-  (error "Assertion on ~s failed" value))
-
-(define-proxy-type asserted-type ()
-  ((predicate-name :initform 'identity
-                   :reader asserted-type-predicate-name
-                   :initarg :predicate-name)
-   (failure-handler-name :initform 'error-assertion-failed
-                         :reader asserted-type-failure-handler-name
-                         :initarg :failure-handler-name)))
-
-(define-immediate-type immediate-asserted-type (asserted-type)
-  ()
-  (:translator (value type)
-    (let ((value (translate-value value (proxied-type type))))
-      (if (funcall (asserted-type-predicate-name type) value)
-        value
-        (funcall (asserted-type-failure-handler-name type) value))))
-  (:translator-expansion (value-form type)
-    (with-gensyms (value)
-      `(let ((,value ,(expand-translate-value value-form (proxied-type type))))
-         (declare (type ,(lisp-type type) ,value))
-         (if (,(asserted-type-predicate-name type) ,value)
-           ,value
-           (,(asserted-type-failure-handler-name type) ,value))))))
-
-(define-aggregate-type aggregate-asserted-type (asserted-type)
-  ()
-  (:reader (pointer out type)
-    (let ((value (read-value pointer out (proxied-type type))))
-      (if (funcall (asserted-type-predicate-name type) value)
-        value
-        (funcall (asserted-type-failure-handler-name type) value))))
-  (:reader-expansion (pointer-form out-form type)
-    (with-gensyms (value)
-      `(let ((,value ,(expand-read-value pointer-form out-form (proxied-type type))))
-         (declare (type ,(lisp-type type) ,value))
-         (if (,(asserted-type-predicate-name type) ,value)
-           ,value
-           (,(asserted-type-failure-handler-name type) ,value))))))
-
-(define-type-parser assert (type &optional (predicate 'identity)
-                                 (failure-handler 'error-assertion-failed))
-  (check-type predicate symbol)
-  (check-type failure-handler symbol)
-  (let ((type (parse-typespec type)))
-    (if (or (primitive-type-p type)
-            (immediate-type-p type))
-      (make-instance 'immediate-asserted-type
-        :type type :predicate-name predicate
-        :failure-handler-name failure-handler)
-      (make-instance 'aggregate-asserted-type
-        :type type :failure-handler-name failure-handler
-        :predicate-name predicate))))
-
-(defmethod unparse-type ((type asserted-type))
-  `(assert ,(unparse-type (proxied-type type))
-     ,(asserted-type-predicate-name type)
-     ,(asserted-type-failure-handler-name type)))
 
 (declaim (inline not-null))
 (defun not-null (x)
@@ -132,5 +87,5 @@
 (defun not-zero (x)
   (not (zerop x)))
 
-(defalias windows-assert (type &optional (predicate 'not-null))
-  `(assert ,type ,predicate %last-error))
+(defalias last-error (type &optional (predicate 'not-null))
+  `(filtered ,type ,predicate %last-error))

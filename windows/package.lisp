@@ -147,9 +147,9 @@
     
     #:get-last-error
     #:set-last-error
-    #:assert
     #:last-error
-    #:windows-assert
+    #:non-system-error
+    #:system-error-code-p
     
     ;;winnt version
     #:winnt-version
@@ -394,8 +394,6 @@
     #:locale-user-default
     #:locale-neutral
     #:locale-invariant
-
-    
     
     ;;utility functions
     #:make-short
@@ -413,8 +411,12 @@
     
     ;;uuid and friends
     #:uuid-of
-    #:uuid-is
-    #:register-uuid
+    #:register-class-uuid
+    #:null-uuid
+    #:null-guid
+    #:null-iid
+    #:null-clsid
+    #:null-fmtid
     
     #:uuid
     #:uuid-dw
@@ -433,8 +435,6 @@
     #:define-uuid
     #:with-uuid-accessors
     #:uuid-equal
-    #:uuid-of
-    #:uuid-is
     
     #:guid
     #:guid-dw

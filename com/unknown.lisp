@@ -1,12 +1,10 @@
 (in-package #:ldx.com)
 
-(define-iid iid-unknown
-    #x00000000 #x0000 #x0000
-    #xC0 #x00 #x00 #x00 #x00 #x00 #x00 #x46)
-
-(define-interface unknown (iid-unknown)
+(define-interface unknown
+    ((iid-unknown #x00000000 #x0000 #x0000
+                  #xC0 #x00 #x00 #x00 #x00 #x00 #x00 #x46))
   "Lisp wrapper for IUnknown inteface"
-  (query-interface (hresult rv (translate pointer (uuid-is iid)))
+  (query-interface (hresult rv (translate pointer (iid-is iid)))
     (iid (& iid))
     (pointer (& pointer :out) :aux))
   (add-ref (ulong))

@@ -316,6 +316,7 @@
   (:georgian-traditional 0)
   (:georgian-modern 1))
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
 (declaim (inline make-lang-id))
 (defun make-lang-id (primary sublang)
   (logior (ash (logand #xFFFF (convert sublang 'sublang))
@@ -356,23 +357,24 @@
 (defun sort-version-from-locale-id (locale-id)
   (logand #xF (ash locale-id -20)))
 
-(load-time-value
-  (defconstant lang-system-default (make-lang-id :neutral :sys-default)))
-(load-time-value
-  (defconstant lang-user-default (make-lang-id :neutral :default)))
-(load-time-value
-  (defconstant locale-system-default (make-locale-id
-                                         lang-system-default
-                                       :default)))
-(load-time-value
-  (defconstant locale-user-default (make-locale-id
-                                       lang-user-default
-                                     :default)))
-(load-time-value
-  (defconstant locale-neutral (make-locale-id
-                                  (make-lang-id :neutral :neutral)
-                                :default)))
-(load-time-value
-  (defconstant locale-invariant (make-locale-id
-                                    (make-lang-id :invariant :neutral)
-                                  :default)))
+
+(defconstant lang-system-default (make-lang-id :neutral :sys-default))
+(defconstant lang-user-default (make-lang-id :neutral :default))
+
+(defconstant locale-system-default (make-locale-id
+                                     lang-system-default
+                                     :default))
+
+(defconstant locale-user-default (make-locale-id
+                                   lang-user-default
+                                   :default))
+
+(defconstant locale-neutral (make-locale-id
+                              (make-lang-id :neutral :neutral)
+                              :default))
+
+(defconstant locale-invariant (make-locale-id
+                                  (make-lang-id :invariant :neutral)
+                                :default))
+
+);;eval-when

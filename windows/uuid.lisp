@@ -136,6 +136,48 @@
   (declare (type fmtid fmtid1 fmtid2))
   (guid-equal fmtid1 fmtid2))
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *uuid-constants* (make-hash-table :test #'equalp))
+  (defvar *guid-constants* (make-hash-table :test #'equalp))
+  (defvar *iid-constants* (make-hash-table :test #'equalp))
+  (defvar *clsid-constants* (make-hash-table :test #'equalp))
+  (defvar *fmtid-constants* (make-hash-table :test #'equalp)))
+
+(defmethod make-load-form ((object uuid) &optional env)
+  (declare (ignore env))
+  (or (gethash object *uuid-constants*)
+      (with-uuid-accessors (dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
+        object
+        `(uuid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8))))
+
+(defmethod make-load-form ((object guid) &optional env)
+  (declare (ignore env))
+  (or (gethash object *guid-constants*)
+      (with-guid-accessors (dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
+        object
+        `(guid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8))))
+
+(defmethod make-load-form ((object iid) &optional env)
+  (declare (ignore env))
+  (or (gethash object *iid-constants*)
+      (with-iid-accessors (dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
+        object
+        `(iid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8))))
+
+(defmethod make-load-form ((object clsid) &optional env)
+  (declare (ignore env))
+  (or (gethash object *clsid-constants*)
+      (with-clsid-accessors (dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
+        object
+        `(clsid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8))))
+
+(defmethod make-load-form ((object fmtid) &optional env)
+  (declare (ignore env))
+  (or (gethash object *fmtid-constants*)
+      (with-fmtid-accessors (dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
+        object
+        `(fmtid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8))))
+
 (defmacro define-uuid (name dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
   (check-type name symbol)
   (check-type dw dword)
@@ -149,8 +191,11 @@
   (check-type b6 ubyte)
   (check-type b7 ubyte)
   (check-type b8 ubyte)
-  `(define-constant ,name (uuid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
-       :test #'guid-equal))
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (define-constant ,name (uuid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
+       :test #'equalp)
+     (setf (gethash ,name *uuid-constants*) ',name)
+     ',name))
 
 (defmacro define-guid (name dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
   (check-type name symbol)
@@ -165,8 +210,11 @@
   (check-type b6 ubyte)
   (check-type b7 ubyte)
   (check-type b8 ubyte)
-  `(define-constant ,name (guid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
-       :test #'guid-equal))
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (define-constant ,name (guid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
+       :test #'equalp)
+     (setf (gethash ,name *guid-constants*) ',name)
+     ',name))
 
 (defmacro define-iid (name dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
   (check-type name symbol)
@@ -181,8 +229,11 @@
   (check-type b6 ubyte)
   (check-type b7 ubyte)
   (check-type b8 ubyte)
-  `(define-constant ,name (iid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
-       :test #'iid-equal))
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (define-constant ,name (iid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
+       :test #'equalp)
+     (setf (gethash ,name *iid-constants*) ',name)
+     ',name))
 
 (defmacro define-clsid (name dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
   (check-type name symbol)
@@ -197,8 +248,11 @@
   (check-type b6 ubyte)
   (check-type b7 ubyte)
   (check-type b8 ubyte)
-  `(define-constant ,name (clsid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
-       :test #'clsid-equal))
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (define-constant ,name (clsid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
+       :test #'equalp)
+     (setf (gethash ,name *clsid-constants*) ',name)
+     ',name))
 
 (defmacro define-fmtid (name dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8)
   (check-type name symbol)
@@ -213,31 +267,52 @@
   (check-type b6 ubyte)
   (check-type b7 ubyte)
   (check-type b8 ubyte)
-  `(define-constant ,name (fmtid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
-       :test #'fmtid-equal))
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (define-constant ,name (fmtid ,dw ,w1 ,w2 ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
+       :test #'equalp)
+     (setf (gethash ,name *fmtid-constants*) ',name)
+     ',name))
 
 (defmacro define-ole-guid (name dw w1 w2)
   `(define-guid ,name ,dw ,w1 ,w2 #xC0 #x00 #x00 #x00 #x00 #x00 #x00 #x46))
 
-(defvar *uuid-hash* (make-hash-table :test #'equalp))
+(define-uuid  null-uuid  0 0 0 0 0 0 0 0 0 0 0)
+(define-guid  null-guid  0 0 0 0 0 0 0 0 0 0 0)
+(define-iid   null-iid   0 0 0 0 0 0 0 0 0 0 0)
+(define-clsid null-clsid 0 0 0 0 0 0 0 0 0 0 0)
+(define-fmtid null-fmtid 0 0 0 0 0 0 0 0 0 0 0)
 
-(defgeneric uuid-of (name)
-  (:method (name)
-    (error "Unable to compute UUID for ~s" name)))
+(defvar *registered-class-names* (make-hash-table :test #'eq))
 
-(defun uuid-is (uuid)
-  (declare (type uuid uuid))
-  (or (gethash uuid *uuid-hash*)
-      (error "Unable to identify UUID ~s" uuid)))
+(declaim (inline uuid-of))
+(defun uuid-of (value)
+  (if (null value)
+    null-uuid
+    (let ((name (if (symbolp value)
+                  value
+                  (class-name (class-of value)))))
+      (or (gethash name *registered-class-names*)
+          (error 'windows-error :code error-invalid-arg)))))
 
-(defmacro register-uuid (uuid name)
-  (check-type name symbol)
-  (once-only (uuid)
-    `(progn
-       (setf (gethash ,uuid *uuid-hash*) ',name)
-       (defmethod uuid-of ((name (eql ',name)))
-         ,uuid)
-       ',name)))
+(define-compiler-macro uuid-of (&whole form value)
+  (if (constantp value)
+    (let ((value (eval value)))
+      (if (null value)
+        null-uuid
+        (let ((name (if (symbolp value)
+                      value
+                      (class-name (class-of value)))))
+          (or (gethash name *registered-class-names*)
+              (error 'windows-error :code error-invalid-arg)))))
+    form))
+
+(defmacro register-class-uuid (class-name uuid)
+  (check-type class-name symbol)
+    `(eval-when (:compile-toplevel :load-toplevel :execute)
+       ,(once-only (uuid)
+          `(setf (gethash ',class-name *registered-class-names*)
+                 (progn (check-type ,uuid uuid) ,uuid)))
+       ',class-name))
 
 (define-struct (objectid
                  (:constructor objectid (lineage uniquifier)))

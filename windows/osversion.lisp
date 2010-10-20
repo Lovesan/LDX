@@ -46,7 +46,7 @@
 (define-external-function
     ("GetVersion" (:camel-case))
     (:stdcall kernel32)
-  ((windows-assert dword not-zero)))
+  ((last-error dword not-zero)))
 
 (load-time-value
   (defconstant winnt-version  (get-version)))
@@ -56,7 +56,7 @@
      #-ldx.unicode "GetVersionExA"
                  get-version-ex)
     (:stdcall kernel32)
-  ((windows-assert boolean) rv version-info)
+  ((last-error boolean) rv version-info)
   (version-info (& os-version-info-ex :inout)
                 :aux
                 (make-os-version-info-ex

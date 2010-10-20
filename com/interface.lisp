@@ -5,6 +5,8 @@
 
 (defvar *com-interface-types* (make-hash-table :test #'eq))
 
+(defvar *interface-names* (make-hash-table :test #'eq))
+
 (defvar *pointer-to-interface-mapping* (make-weak-hash-table :test #'eql
                                          :weakness :value))
 
@@ -13,6 +15,16 @@
              (:constructor nil)
              (:conc-name nil))
   (com-interface-pointer &0 :type pointer))
+
+(defun iid-is (name)
+  (check-type name symbol)
+  (or (gethash name *interface-names*)
+      (error 'windows-error :code error-no-interface)))
+
+(define-compiler-macro iid-is (&whole form name)
+  (if (constantp name)
+    (iid-is (eval name))
+    form))
 
 (define-immediate-type com-interface-type ()
   ((name :initform nil
@@ -201,11 +213,11 @@
                ,trampoline-name)))))))
 
 (defmacro define-interface (name-and-options
-                             (&optional iid-name (parent-name nil parent-name-p))
+                             (&optional iid (parent-name nil parent-name-p))
                              &rest doc-and-methods)
   (check-type parent-name symbol)
   (check-type name-and-options (or symbol cons))
-  (check-type iid-name symbol)
+  (check-type iid (or symbol cons))
   (destructuring-bind
       (name &key (constructor-name name)
             (vtable-name (intern (format nil "~a::~a-~a"
@@ -253,8 +265,22 @@
                            '(simple-array uint-ptr (,(length parent-methods))))
                     (deref ,parent-vtable
                            '(simple-array uint-ptr (,(length parent-methods)))))))
-       ,@(when iid-name
-           `((register-uuid ,iid-name ,name)))
+       ,(cond
+          ((null iid) nil)
+          ((symbolp iid) `(progn
+                            (register-class-uuid ,name ,(let* ((name iid)
+                                                               (iid (eval name)))
+                                                          (check-type iid iid)
+                                                          name))
+                            (eval-when (:compile-toplevel :load-toplevel :execute)
+                              (setf (gethash ',name *interface-names*) ,iid))))
+          ((consp iid) (destructuring-bind
+                           (iid-name dw w1 w2 b1 b2 b3 b4 b5 b6 b7 b8) iid
+                         `(progn (define-iid ,iid-name ,dw ,w1 ,w2
+                                   ,b1 ,b2 ,b3 ,b4 ,b5 ,b6 ,b7 ,b8)
+                                 (register-class-uuid ,name ,iid-name)
+                                 (eval-when (:compile-toplevel :load-toplevel :execute)
+                                   (setf (gethash ',name *interface-names*) ,iid-name))))))
        ,@(loop :with vtable-index = (length parent-methods)
              :for (method-name . method-spec) :in methods
              :for (method-def trampoline-def trampoline-name) =
