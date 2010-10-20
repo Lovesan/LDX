@@ -86,25 +86,32 @@
 (defmethod uuid-of ((class com-interface-class))
   (closer-mop:standard-instance-access class iid-slot-location))
 
-(defun translate-interface (pointer name &optional (finalizable T))
+(defun translate-interface (pointer class &optional (finalizable T))
   (declare (type pointer pointer)
-           (type symbol name)
+           (type (or symbol com-interface-class) class)
            (optimize (speed 3)))
+  (unless (typep class 'com-interface-class)
+    (setf class (find-interface-class class)))
   (if (&? pointer)
     (let* ((address (the size-t (&& pointer)))
-           (typed-pointer (cons address name))
+           (typed-pointer (cons address class))
            (interface (gethash typed-pointer *pointer-to-interface-mapping*)))
-      (unless interface
-          (setf (gethash typed-pointer *pointer-to-interface-mapping*)
-                (setf interface (make-instance name :pointer pointer
-                                  :finalizable finalizable))))
+      (if interface
+        (when finalizable
+          (initialize-instance interface :finalizable t))
+        (setf (gethash typed-pointer *pointer-to-interface-mapping*)
+              (setf interface (make-instance class
+                                :pointer pointer
+                                :finalizable finalizable))))
       interface)
     nil))
 
 (declaim (inline convert-interface))
 (defun convert-interface (interface)
-  (declare (type com-interface interface))
-  (com-interface-pointer interface))
+  (declare (type (or null com-interface) interface))
+  (if (null interface)
+    &0
+    (com-interface-pointer interface)))
 
 (define-immediate-type com-interface-type ()
   ((name :initform nil
@@ -114,18 +121,22 @@
                 :initarg :finalizable
                 :reader com-interface-type-finalizable-p))
   (:base-type pointer)
-  (:lisp-type (type) (com-interface-type-name type))
+  (:lisp-type (type) `(or null ,(com-interface-type-name type)))
+  (:prototype (type) nil)
+  (:prototype-expansion (type) nil)
   (:converter (lisp-value type)    
     (convert-interface lisp-value))
   (:translator (pointer type)
     (translate-interface pointer
-                         (com-interface-type-name type)
+                         (find-interface-class
+                           (com-interface-type-name type))
                          (com-interface-type-finalizable-p type)))
   (:converter-expansion (lisp-value-form type)
     `(convert-interface ,lisp-value-form))
   (:translator-expansion (pointer-form type)
     `(translate-interface ,pointer-form
-                          ',(com-interface-type-name type)
+                          (find-interface-class
+                            ',(com-interface-type-name type))
                           ,(and (com-interface-type-finalizable-p type)
                                 T)))
   (:allocator-expansion (value type)

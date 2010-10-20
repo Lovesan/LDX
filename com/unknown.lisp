@@ -4,21 +4,26 @@
     ((iid-unknown #x00000000 #x0000 #x0000
                   #xC0 #x00 #x00 #x00 #x00 #x00 #x00 #x46))
   "Lisp wrapper for IUnknown inteface"
-  (query-interface (hresult rv
-                     (let ((class (find-interface-class-by-iid iid nil)))
-                       (unless class
-                         (when (&? pointer)
-                           (external-pointer-call
-                             (deref (&+ (deref pointer '*) 2 '*) '*)
-                             ((:stdcall)
-                              (ulong)
-                              (pointer this :aux pointer))))
-                         (error 'windows-error :code error-no-interface))
-                       (translate-interface pointer (class-name class))))
-    (iid (& iid))
-    (pointer (& pointer :out) :aux))
+  ;;Query interface is just a stub for now.
+  ;;See real method definition further.
+  ;;This is required because we do not support recursive types.
+  ;;And this is also the reason of presence of DEFINE-INTERFACE-METHOD macro.
+  (query-interface (hresult)
+    (iid pointer)
+    (pout pointer :aux))
   (add-ref (ulong))
   (release (ulong)))
+
+;;This is the true method
+(define-interface-method unknown query-interface
+  (hresult rv
+    (translate-interface
+      (com-interface-pointer interface)
+      (or (find-interface-class-by-iid iid nil)
+          (progn (when interface (release interface))
+                 (error 'windows-error :code error-no-interface)))))
+  (iid (& iid))
+  (interface (& (unknown nil) :out) :aux))
 
 (defmethod shared-initialize :after
   ((object unknown) slot-names &rest initargs &key &allow-other-keys)
