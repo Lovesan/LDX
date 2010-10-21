@@ -1,1 +1,13 @@
-An attempt to bring DirectX into Common Lisp.
+LDX is an attempt to bring DirectX into Common Lisp.
+
+Here's the list of dependencies:
+    * doors http://github.com/Lovesan/doors
+        which depends on:
+        ** alexandria http://common-lisp.net/project/alexandria/
+        ** trivial-features http://www.cliki.net/trivial-features
+        ** virgil http://github.com/Lovesan/virgil
+            which, in turns, also depends on:
+            *** cffi http://common-lisp.net/project/cffi/
+            *** babel http://common-lisp.net/project/babel/
+        ** trivial-garbage http://www.cliki.net/trivial-garbage
+        ** closer-mop http://common-lisp.net/project/closer/closer-mop.htm
