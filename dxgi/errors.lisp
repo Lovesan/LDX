@@ -27,9 +27,14 @@
 (define-results dxgi-error (com-error)
   ()
   ((invalid-call #x887A0001
-     "The application provided invalid parameter data; this must be debugged and fixed before the application is released.")
+"
+The application provided invalid parameter data;
+  this must be debugged and fixed before the application is released.")
    (not-found #x887A0002
-     "When calling IDXGIObject::GetPrivateData, the GUID passed in is not recognized as one previously passed to IDXGIObject::SetPrivateData or IDXGIObject::SetPrivateDataInterface. When calling IDXGIFactory::EnumAdapters or IDXGIAdapter::EnumOutputs, the enumerated ordinal is out of range.")
+"
+When calling dxgi:private-data - the GUID passed in is not recognized as one
+  previously passed to (setf dxgi:private-data) or (setf dxgi:private-data-interface).
+When calling dxgi:enum-adapters or dxgi:enum-outputs, the enumerated ordinal is out of range.")
    (more-data #x887A0003
      "The buffer supplied by the application is not big enough to hold the requested data.")
    (unsupported #x887A0004
@@ -39,7 +44,9 @@
    (device-hung #x887A0006
      "The application's device failed due to badly formed commands sent by the application.")
    (device-reset #x887A0007
-     "The device failed due to a badly formed command. This is a run-time issue; The application should destroy and recreate the device.")
+"
+The device failed due to a badly formed command. This is a run-time issue;
+  The application should destroy and recreate the device.")
    (was-still-drawing #x887A000A
      "The device was busy, and did not schedule the requested task.")
    (frame-statistics-disjoint #x887A000B
@@ -49,7 +56,9 @@
    (driver-internal-error #x887A0020
      "The driver encountered a problem and was put into the device removed state.")
    (non-exclusive #x887A0021
-     "The application attempted to acquire exclusive ownership of an output, but failed because some other application (or device within the application) has already acquired ownership.")
+"
+The application attempted to acquire exclusive ownership of an output,
+  but failed because some other application (or device within the application) has already acquired ownership.")
    (not-currently-available #x887A0022
      "The requested functionality is not supported by the device or the driver.")
    (remote-client-disconnected #x887A0023)
@@ -58,14 +67,14 @@
 
 (define-results dxgi-status (windows-status)
   ()
-  ((occluded #x887A0001
+  ((occluded #x087A0001
      "The window content is not visible.")
-   (clipped #x887A0002)
-   (no-redirection #x887A0004)
-   (no-desktop-access #x887A0005)
-   (graphics-vidpn-source-in-use #x887A0006)
-   (mode-changed #x887A0007
+   (clipped #x087A0002)
+   (no-redirection #x087A0004)
+   (no-desktop-access #x087A0005)
+   (graphics-vidpn-source-in-use #x087A0006)
+   (mode-changed #x087A0007
      "The desktop display mode has been changed, there might be color conversion/stretching.")
-   (mode-change-in-progress #x887A0008
+   (mode-change-in-progress #x087A0008
      "Fullscreen/windowed mode transition is occurring when either API is called."))
   (:conc-name dxgi-status-))
