@@ -22,20 +22,18 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(defsystem #:ldx.dxgi
+(defsystem #:ldx.compiler
   :version "0.1.0"
-  :description "Bridge to DXGI, DirectX Graphics Infrastructure"
+  :description "An interface to Direct3D shader compiler"
   :author "Dmitry Ignatiev <lovesan.ru at gmail.com>"
   :maintainer "Dmitry Ignatiev <lovesan.ru at gmail.com>"
   :licence "MIT"
   :depends-on (#:virgil #:doors #:ldx.common)
   :serial t
-  :components ((:module "dxgi"
+  :components ((:module "compiler"
                         :serial t
                         :components ((:file "package")
                                      (:file "library")
-                                     (:file "errors")
-                                     (:file "types")
-                                     (:file "interfaces")))))
+                                     (:file "compiler")))))
 
 ;; vim: ft=lisp et

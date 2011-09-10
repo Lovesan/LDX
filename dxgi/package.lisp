@@ -1,6 +1,6 @@
 ;;;; -*- Mode: lisp; indent-tabs-mode: nil -*-
 
-;;; Copyright (C) 2010-2011, Dmitry Ignatiev <lovesan.ru@gmail.com>
+;;; Copyright (C) 2010-2011, Dmitry Ignatiev <lovesan.ru at gmail.com>
 
 ;;; Permission is hereby granted, free of charge, to any person
 ;;; obtaining a copy of this software and associated documentation
@@ -26,7 +26,7 @@
 
 (defpackage #:ldx.dxgi
   (:nicknames #:dxgi)
-  (:use #:cl #:alexandria #:virgil #:doors #:doors.com)
+  (:use #:cl #:alexandria #:virgil #:doors #:doors.com #:ldx)
   (:export
     
     ;;DLL
@@ -213,7 +213,7 @@
     
     ;;structures
     #:rgb
-    #:rational
+    #:dxgi-rational
     #:mode-desc
     #:make-mode-desc
     #:copy-mode-desc

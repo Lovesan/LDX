@@ -1,6 +1,6 @@
 ;;;; -*- Mode: lisp; indent-tabs-mode: nil -*-
 
-;;; Copyright (C) 2010-2011, Dmitry Ignatiev <lovesan.ru@gmail.com>
+;;; Copyright (C) 2010-2011, Dmitry Ignatiev <lovesan.ru at gmail.com>
 
 ;;; Permission is hereby granted, free of charge, to any person
 ;;; obtaining a copy of this software and associated documentation
@@ -24,7 +24,7 @@
 
 (in-package #:ldx.dxgi)
 
-(define-results dxgi-error (com-error)
+(define-results dxgi-error (ldx-error)
   ()
   ((invalid-call #x887A0001
 "
@@ -65,7 +65,7 @@ The application attempted to acquire exclusive ownership of an output,
    (remote-out-of-memory #x887A0024))
   (:conc-name dxgi-error-))
 
-(define-results dxgi-status (windows-status)
+(define-results dxgi-status (ldx-status)
   ()
   ((occluded #x087A0001
      "The window content is not visible.")

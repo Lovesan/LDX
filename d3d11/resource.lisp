@@ -1,0 +1,13 @@
+(define-enum (resource-misc-flags
+               (:conc-name resource-misc-)
+               (:base-type dword)
+               (:list t))
+  (:generate-mips #x1)
+  (:shared #x2)
+  (:texture-cube #x4)
+  (:draw-indirect-args #x10)  
+  (:buffer-allow-raw-views #x20)
+  (:buffer-structured #x40)
+  (:resource-clamp #x80)
+  (:shared-keyed-mutex #x100)
+  (:gdi-compatible #x200))

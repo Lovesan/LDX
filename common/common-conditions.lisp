@@ -22,20 +22,26 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(defsystem #:ldx.dxgi
-  :version "0.1.0"
-  :description "Bridge to DXGI, DirectX Graphics Infrastructure"
-  :author "Dmitry Ignatiev <lovesan.ru at gmail.com>"
-  :maintainer "Dmitry Ignatiev <lovesan.ru at gmail.com>"
-  :licence "MIT"
-  :depends-on (#:virgil #:doors #:ldx.common)
-  :serial t
-  :components ((:module "dxgi"
-                        :serial t
-                        :components ((:file "package")
-                                     (:file "library")
-                                     (:file "errors")
-                                     (:file "types")
-                                     (:file "interfaces")))))
+(in-package #:ldx)
 
-;; vim: ft=lisp et
+(define-results ldx-condition ()
+  ()
+  ()
+  (:conc-name ldx-condition-))
+
+(define-results ldx-error (com-error ldx-condition)
+  ()
+  ((invalid-call #x8876086C
+     "The method call is invalid. For example, a method's parameter may not be a valid pointer.")
+   (was-still-drawing #x8876021C
+     "The previous blit operation that is transferring information to or from this surface is incomplete.")
+   (file-not-found #x88790002
+     "The file was not found.")
+   (too-many-unique-state-objects #x88790001
+     "There are too many unique instances of a particular type of state object."))
+  (:conc-name ldx-error-))
+
+(define-results ldx-status (windows-status ldx-condition)
+  ()
+  ()
+  (:conc-name ldx-status-))

@@ -22,20 +22,21 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(defsystem #:ldx.dxgi
+(defsystem #:ldx.common
   :version "0.1.0"
-  :description "Bridge to DXGI, DirectX Graphics Infrastructure"
+  :description "Common DirectX functions, macros and interfaces"
   :author "Dmitry Ignatiev <lovesan.ru at gmail.com>"
   :maintainer "Dmitry Ignatiev <lovesan.ru at gmail.com>"
   :licence "MIT"
-  :depends-on (#:virgil #:doors #:ldx.common)
+  :depends-on (#:virgil #:doors)
   :serial t
-  :components ((:module "dxgi"
+  :components ((:module "common"                        
                         :serial t
                         :components ((:file "package")
-                                     (:file "library")
-                                     (:file "errors")
-                                     (:file "types")
-                                     (:file "interfaces")))))
+                                     (:file "common-conditions")
+                                     (:file "common-enums")
+                                     (:file "common-structures")
+                                     (:file "common-interfaces")))))
 
 ;; vim: ft=lisp et
+

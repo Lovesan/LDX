@@ -22,20 +22,25 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(defsystem #:ldx.dxgi
-  :version "0.1.0"
-  :description "Bridge to DXGI, DirectX Graphics Infrastructure"
-  :author "Dmitry Ignatiev <lovesan.ru at gmail.com>"
-  :maintainer "Dmitry Ignatiev <lovesan.ru at gmail.com>"
-  :licence "MIT"
-  :depends-on (#:virgil #:doors #:ldx.common)
-  :serial t
-  :components ((:module "dxgi"
-                        :serial t
-                        :components ((:file "package")
-                                     (:file "library")
-                                     (:file "errors")
-                                     (:file "types")
-                                     (:file "interfaces")))))
+(in-package #:ldx)
 
-;; vim: ft=lisp et
+(define-interface blob ((iid-blob "{8BA5FB08-5195-40e2-AC58-0D989C3A0102}")
+                        unknown)
+  "This interface is used to return arbitrary length data."
+  (blob-pointer (pointer)
+    "Retrieves a pointer to blob's data")
+  (blob-size (size-t)
+    "Retrieves the size, in bytes, of the blob's data"))
+
+(define-interface include ()
+  "An include interface that the user implements to allow an application to call user-overridable methods for opening and closing shader #include files."
+  (include-open (hresult)
+    "A user-implemented method for opening and reading the contents of a shader #include file."
+    (include-type include-type)
+    (filename (& astring))
+    (parent-data pointer)
+    (out-data (& pointer :out))
+    (bytes (& uint :inout)))
+  (include-close (hresult)
+    "A user-implemented method for closing a shader #include file."
+    (data pointer)))

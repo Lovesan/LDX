@@ -22,20 +22,11 @@
 ;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ;;; DEALINGS IN THE SOFTWARE.
 
-(defsystem #:ldx.dxgi
-  :version "0.1.0"
-  :description "Bridge to DXGI, DirectX Graphics Infrastructure"
-  :author "Dmitry Ignatiev <lovesan.ru at gmail.com>"
-  :maintainer "Dmitry Ignatiev <lovesan.ru at gmail.com>"
-  :licence "MIT"
-  :depends-on (#:virgil #:doors #:ldx.common)
-  :serial t
-  :components ((:module "dxgi"
-                        :serial t
-                        :components ((:file "package")
-                                     (:file "library")
-                                     (:file "errors")
-                                     (:file "types")
-                                     (:file "interfaces")))))
+(in-package #:ldx)
 
-;; vim: ft=lisp et
+(define-struct (shader-macro
+                 (:constructor make-shader-macro ())
+                 (:constructor shader-macro (name definition)))
+    "Defines a shader macro."
+  (name (& (const astring)))
+  (definition (& (const astring))))
