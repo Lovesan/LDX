@@ -1,2 +1,5 @@
+v0.2.0
+    * Added an interface to shader compiler.
+
 v0.1.0
     * Added DXGI bindings
